@@ -176,14 +176,21 @@ pull_git() {
 
   if [ -d "$git_tmp/.git" ]; then
     log "Updating repo at $git_tmp"
-    ( cd "$git_tmp" && git remote set-url origin "$repo_url" >/dev/null 2>&1 || true
-      git_with_optional_header pull --depth=1 origin HEAD
-    ) || { log "Error: git pull failed"; return 1; }
-    ( cd "$git_tmp" && git reset --hard FETCH_HEAD ) || { log "Error: git reset failed"; return 1; }
+    (
+      cd "$git_tmp" || exit 1
+      git remote set-url origin "$repo_url" >/dev/null 2>&1 || true
+      # 只抓取远端默认分支的最新提交
+      git_with_optional_header fetch -q --depth=1 --prune origin HEAD \
+        || { log "Error: git fetch failed"; exit 1; }
+      # 强制把工作区对齐到该提交（避免 pull 的分叉合并问题）
+      git -c advice.detachedHead=false checkout -q --detach FETCH_HEAD \
+        || { log "Error: git checkout FETCH_HEAD failed"; exit 1; }
+    ) || { log "Error: git refresh failed"; return 1; }
   else
     log "Cloning repo to $git_tmp"
     rm -rf "$git_tmp"
-    git_with_optional_header clone --depth=1 "$repo_url" "$git_tmp" || { log "Error: git clone failed"; return 1; }
+    git_with_optional_header clone -q --depth=1 "$repo_url" "$git_tmp" \
+      || { log "Error: git clone failed"; return 1; }
   fi
 
   local src_file="$git_tmp/$src_path"
