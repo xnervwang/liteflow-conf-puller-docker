@@ -198,6 +198,7 @@ pull_git() {
   else
     [ -f "$dest_path" ] && ! command -v cmp >/dev/null 2>&1 && log "cmp not found, overwriting"
     cp "$src_file" "$dest_path" || return 1
+    log "Copied $src_file to $dest_path"
   fi
 
   log "Successfully pulled (git)"
