@@ -260,6 +260,8 @@ main() {
         log "fetch failed"
       fi
       sleep "$interval"
+
+      [ -f /run/puller.ready ] || touch /run/puller.ready
     done
   else
     run_once "$mode"
