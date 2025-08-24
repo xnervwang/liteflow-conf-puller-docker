@@ -236,14 +236,27 @@ main() {
 
   log "Mode=$mode DEST_FILE=$DEST_FILE BACKUP=$BACKUP FORCE=$FORCE INTERVAL=${interval:-0}"
 
-  dp_exists=$([ -e "$DEST_FILE" ] && echo yes || echo no)
-dp_type=$([ -d "$DEST_FILE" ] && echo dir || { [ -f "$DEST_FILE" ] && echo file || echo other; })
-dp_trailing=$([[ "$DEST_FILE" == */ ]] && echo yes || echo no)
-dd_exists=$([ -e "$DEST_FILE" ] && echo yes || echo no)
-dd_is_dir=$([ -d "$DEST_FILE" ] && echo yes || echo no)
+  # 计算路径
+  dest_path="$DEST_FILE"
+  dest_dir="$(dirname -- "$DEST_FILE")"
 
-log "dest_path:$DEST_FILE exists:$dp_exists type:$dp_type trailing_slash:$dp_trailing dest_dir:$dest_dir exists:$dd_exists is_dir:$dd_is_dir"
+  # 尾斜杠与“目标为目录”一律拒绝
+  case "$dest_path" in
+    */) log "Error: DEST_FILE must NOT end with '/' ($dest_path)"; exit 1;;
+  esac
+  if [ -d "$dest_path" ]; then
+    log "Error: DEST_FILE is a directory: $dest_path"
+    exit 1
+  fi
 
+  # 更清晰的状态日志
+  dp_exists=$([ -e "$dest_path" ] && echo yes || echo no)
+  dp_type=$([ -d "$dest_path" ] && echo dir || { [ -f "$dest_path" ] && echo file || echo other; })
+  dp_trailing=$([[ "$dest_path" == */ ]] && echo yes || echo no)
+  dd_exists=$([ -e "$dest_dir" ] && echo yes || echo no)
+  dd_is_dir=$([ -d "$dest_dir" ] && echo yes || echo no)
+  
+  log "dest_path:$dest_path exists:$dp_exists type:$dp_type trailing_slash:$dp_trailing dest_dir:$dest_dir exists:$dd_exists is_dir:$dd_is_dir"
 
   if [ -n "$interval" ] && [ "$interval" -gt 0 ] 2>/dev/null; then
     while :; do
