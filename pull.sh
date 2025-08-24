@@ -39,6 +39,9 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PACKAGE_DIR=$(dirname "$SCRIPT_DIR")
 PACKAGE_KEY=$(echo "$PACKAGE_DIR" | sed 's|/|_|g')
 
+# —— 就绪标记（可用 READY_FLAG 覆盖，默认 /run/puller.ready）——
+: "${READY_FLAG:=/run/puller.ready}"
+
 REAL_USER=${SUDO_USER:-$USER}
 REAL_HOME=$(eval echo ~$REAL_USER)
 TEMP_DIR="${TMPDIR:-${TMP:-${TEMP:-/tmp}}}"
