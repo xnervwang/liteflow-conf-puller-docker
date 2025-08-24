@@ -161,16 +161,6 @@ pull_git() {
   ensure_known_hosts "$repo_url"
 
   local dest_dir; dest_dir="$(dirname "$dest_path")"
-
-  dp_exists=$([ -e "$dest_path" ] && echo yes || echo no)
-dp_type=$([ -d "$dest_path" ] && echo dir || { [ -f "$dest_path" ] && echo file || echo other; })
-dp_trailing=$([[ "$dest_path" == */ ]] && echo yes || echo no)
-dd_exists=$([ -e "$dest_dir" ] && echo yes || echo no)
-dd_is_dir=$([ -d "$dest_dir" ] && echo yes || echo no)
-
-log "dest_path:$dest_path exists:$dp_exists type:$dp_type trailing_slash:$dp_trailing dest_dir:$dest_dir exists:$dd_exists is_dir:$dd_is_dir"
-
-
   mkdir -p "$dest_dir" && { log "Created folder $dest_dir"; } || { log "Error: cannot create $dest_dir"; return 1; }
 
   if [ -f "$dest_path" ]; then
