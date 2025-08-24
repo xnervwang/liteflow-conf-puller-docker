@@ -10,11 +10,7 @@ FROM alpine:3.20
 ENV TZ=UTC \
     INTERVAL="60"
 
-# 预设 APK 源到 kernel.org（美国镜像）
 RUN set -eux; \
-    ver="$(cut -d. -f1,2 /etc/alpine-release)"; \
-    base="https://mirrors.edge.kernel.org/alpine/v${ver}"; \
-    printf "%s/main\n%s/community\n" "$base" "$base" > /etc/apk/repositories; \
     apk add --no-cache bash git openssh-client diffutils ca-certificates tzdata; \
     update-ca-certificates
 

@@ -30,6 +30,7 @@
 # - 本脚本只读 env，不接受命令行参数。
 # - 已将 known_hosts 写入 /etc/ssh/ssh_known_hosts（无需写入 ~/.ssh）。
 # - 需要容器内具备：git（git 模式），wget 或 curl（wget 模式），可选 cmp。
+# - 目前只支持~/.ssh/id_rsa？
 
 set +e
 
@@ -38,6 +39,9 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:${PATH}
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 PACKAGE_DIR=$(dirname "$SCRIPT_DIR")
 PACKAGE_KEY=$(echo "$PACKAGE_DIR" | sed 's|/|_|g')
+
+# —— 就绪标记（可用 READY_FLAG 覆盖，默认 /run/puller.ready）——
+: "${READY_FLAG:=/run/puller.ready}"
 
 REAL_USER=${SUDO_USER:-$USER}
 REAL_HOME=$(eval echo ~$REAL_USER)
