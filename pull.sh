@@ -236,6 +236,15 @@ main() {
 
   log "Mode=$mode DEST_FILE=$DEST_FILE BACKUP=$BACKUP FORCE=$FORCE INTERVAL=${interval:-0}"
 
+  dp_exists=$([ -e "$DEST_FILE" ] && echo yes || echo no)
+dp_type=$([ -d "$DEST_FILE" ] && echo dir || { [ -f "$DEST_FILE" ] && echo file || echo other; })
+dp_trailing=$([[ "$DEST_FILE" == */ ]] && echo yes || echo no)
+dd_exists=$([ -e "$DEST_FILE" ] && echo yes || echo no)
+dd_is_dir=$([ -d "$DEST_FILE" ] && echo yes || echo no)
+
+log "dest_path:$DEST_FILE exists:$dp_exists type:$dp_type trailing_slash:$dp_trailing dest_dir:$dest_dir exists:$dd_exists is_dir:$dd_is_dir"
+
+
   if [ -n "$interval" ] && [ "$interval" -gt 0 ] 2>/dev/null; then
     while :; do
       if run_once "$mode"; then
