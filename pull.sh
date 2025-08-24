@@ -107,6 +107,13 @@ git_with_optional_header() {
   fi
 }
 
+mark_ready() {
+  # 幂等创建标记文件；/run 通常是可写 tmpfs
+  mkdir -p "$(dirname "$READY_FLAG")" 2>/dev/null || true
+  : > "$READY_FLAG"
+  log "Ready flag created: $READY_FLAG"
+}
+
 pull_wget() {
   local url="$1" dest_path="$2" backup="$3" force="$4"
 
@@ -145,6 +152,7 @@ pull_wget() {
     cp "$tmp" "$dest_path" || { rm -f "$tmp"; return 1; }
   fi
   rm -f "$tmp"
+  mark_ready
   log "Successfully pulled (wget)"
   return 0
 }
@@ -208,6 +216,7 @@ pull_git() {
     log "Copied $src_file to $dest_path"
   fi
 
+  mark_ready
   log "Successfully pulled (git)"
   return 0
 }
@@ -260,8 +269,6 @@ main() {
         log "fetch failed"
       fi
       sleep "$interval"
-
-      [ -f /run/puller.ready ] || touch /run/puller.ready
     done
   else
     run_once "$mode"
