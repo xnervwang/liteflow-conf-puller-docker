@@ -114,7 +114,7 @@ pull_wget() {
   [ -n "$url" ] && [ -n "$dest_path" ] || { log "Error: FETCH_URL/DEST_FILE required"; return 1; }
 
   local dest_dir; dest_dir="$(dirname "$dest_path")"
-  mkdir -p "$dest_dir" || { log "Error: cannot create $dest_dir"; return 1; }
+  mkdir -p "$dest_dir" && { log "Created folder $dest_dir" } || { log "Error: cannot create $dest_dir"; return 1; }
 
   if [ -f "$dest_path" ]; then
     if is_true "$backup"; then
@@ -161,7 +161,7 @@ pull_git() {
   ensure_known_hosts "$repo_url"
 
   local dest_dir; dest_dir="$(dirname "$dest_path")"
-  mkdir -p "$dest_dir" || { log "Error: cannot create $dest_dir"; return 1; }
+  mkdir -p "$dest_dir" && { log "Created folder $dest_dir" } || { log "Error: cannot create $dest_dir"; return 1; }
 
   if [ -f "$dest_path" ]; then
     if is_true "$backup"; then
